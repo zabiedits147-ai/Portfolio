@@ -25,43 +25,49 @@ const skillGroups = [
   { title: "Tools", items: ["Git", "Postman", "VS Code"] }
 ];
 
-// ---------- Render projects ----------
+// ---------- Render projects (only if this page has the container) ----------
 const projectList = document.getElementById("project-list");
-projects.forEach(p => {
-  const card = document.createElement("div");
-  card.className = "project-card tilt-el";
-  card.innerHTML = `
-    <h3>${p.title}</h3>
-    <p>${p.desc}</p>
-    <div class="stack-tags">${p.stack.map(s => `<span>${s}</span>`).join("")}</div>
-  `;
-  projectList.appendChild(card);
-});
-
-// ---------- Render skills ----------
-const skillContainer = document.getElementById("skill-groups");
-skillGroups.forEach(g => {
-  const group = document.createElement("div");
-    group.className = "skill-group tilt-el";
-  group.innerHTML = `
-    <h4>${g.title}</h4>
-    <ul>${g.items.map(i => `<li>${i}</li>`).join("")}</ul>
-  `;
-  skillContainer.appendChild(group);
-});
-
-// ---------- Typing effect (hero status line) ----------
-const statusText = document.getElementById("status-text");
-const statusMessage = "Currently building TradeHub PK";
-let charIndex = 0;
-function typeStatus() {
-  if (charIndex <= statusMessage.length) {
-    statusText.textContent = statusMessage.slice(0, charIndex);
-    charIndex++;
-    setTimeout(typeStatus, 40);
-  }
+if (projectList) {
+  projects.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "project-card tilt-el";
+    card.innerHTML = `
+      <h3>${p.title}</h3>
+      <p>${p.desc}</p>
+      <div class="stack-tags">${p.stack.map(s => `<span>${s}</span>`).join("")}</div>
+    `;
+    projectList.appendChild(card);
+  });
 }
-typeStatus();
+
+// ---------- Render skills (only if this page has the container) ----------
+const skillContainer = document.getElementById("skill-groups");
+if (skillContainer) {
+  skillGroups.forEach(g => {
+    const group = document.createElement("div");
+    group.className = "skill-group tilt-el";
+    group.innerHTML = `
+      <h4>${g.title}</h4>
+      <ul>${g.items.map(i => `<li>${i}</li>`).join("")}</ul>
+    `;
+    skillContainer.appendChild(group);
+  });
+}
+
+// ---------- Typing effect (hero status line — only on homepage) ----------
+const statusText = document.getElementById("status-text");
+if (statusText) {
+  const statusMessage = "Currently building TradeHub PK";
+  let charIndex = 0;
+  function typeStatus() {
+    if (charIndex <= statusMessage.length) {
+      statusText.textContent = statusMessage.slice(0, charIndex);
+      charIndex++;
+      setTimeout(typeStatus, 40);
+    }
+  }
+  typeStatus();
+}
 
 // ---------- 3D tilt on hover ----------
 function applyTilt(el, maxTilt = 8) {
@@ -79,7 +85,6 @@ function applyTilt(el, maxTilt = 8) {
     el.style.transform = "perspective(800px) rotateX(0) rotateY(0) scale(1)";
   });
 }
-
 document.querySelectorAll(".tilt-el, .hero-tilt").forEach(el => applyTilt(el));
 
 // ---------- Theme toggle ----------
@@ -88,31 +93,14 @@ const html = document.documentElement;
 const savedTheme = localStorage.getItem("theme");
 if (savedTheme) html.setAttribute("data-theme", savedTheme);
 
-themeToggle.addEventListener("click", () => {
-  const current = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
-  html.setAttribute("data-theme", current);
-  localStorage.setItem("theme", current);
-});
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const current = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    html.setAttribute("data-theme", current);
+    localStorage.setItem("theme", current);
+  });
+}
 
-// ---------- Smooth scroll + active nav link ----------
-document.querySelectorAll('.nav-link').forEach(link => {
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelector(link.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
-  });
-});
-
-const sections = document.querySelectorAll("section[id]");
-window.addEventListener("scroll", () => {
-  let current = "";
-  sections.forEach(sec => {
-    const top = sec.offsetTop - 100;
-    if (scrollY >= top) current = sec.id;
-  });
-  document.querySelectorAll(".nav-link").forEach(link => {
-    link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
-  });
-});
 // ---------- 3D scroll reveal ----------
 document.querySelectorAll("h2, .about-grid, .project-card, .skill-group, .contact-link")
   .forEach(el => el.classList.add("reveal-3d"));
